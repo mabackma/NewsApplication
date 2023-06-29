@@ -1,15 +1,18 @@
 package com.example.newsapplication
 
+import android.R
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.RadioButton
+import android.widget.RadioGroup
+import android.widget.Toast
+import androidx.fragment.app.Fragment
 import com.android.volley.Request
 import com.android.volley.RequestQueue
 import com.android.volley.toolbox.JsonArrayRequest
-import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import com.example.newsapplication.databinding.FragmentHomeBinding
 import com.example.newsapplication.datatypes.NewsItem
@@ -19,6 +22,7 @@ import com.google.gson.reflect.TypeToken
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
+
 
 class HomeFragment : Fragment() {
 
@@ -37,7 +41,11 @@ class HomeFragment : Fragment() {
         val root: View = binding.root
 
         binding.buttonMakeQuery.setOnClickListener{
-            makeQueryWithPost()
+            if(binding.editTextQuery.text.toString().isBlank()) {
+                Toast.makeText(context, "Please enter search keywords", Toast.LENGTH_SHORT).show()
+            }
+            else
+                makeQueryWithPost()
         }
 
         return root
@@ -49,17 +57,41 @@ class HomeFragment : Fragment() {
     }
 
     fun makeQueryWithPost() {
+        val queryWords = binding.editTextQuery.text.toString()
+        var searchIn = ""
+        if(binding.checkboxTitle.isChecked){
+            searchIn += "title"
+        }
+        if(binding.checkboxDescription.isChecked){
+            searchIn += ",description"
+        }
+        if(binding.checkboxContent.isChecked){
+            searchIn += ",content"
+        }
+        if(searchIn.startsWith(",")) {
+            searchIn = searchIn.substring(1)
+        }
+
+        val chosenLanguageId = binding.radioGroupLanguages.checkedRadioButtonId
+        val chosenLanguageRadioButton: RadioButton = view!!.findViewById(chosenLanguageId)
+        var language = chosenLanguageRadioButton.text.toString()
+
+        if(language == "all") {
+            language = ""
+        }
+
+        // Make the query object
         val userQuery: UserQuery = UserQuery(
-            query = "conspiracy theory wagner",
-            searchIn = "title,description,content",
+            query = queryWords,
+            searchIn = searchIn,
             sortItems = "publishedAt",
-            language = "en",
+            language = language,
             pageSize = 10,
             page = 1,
-            start = "2023-06-25",
+            start = "2023-06-10",
             end = "2023-06-26")
-        val jsonItem = gson.toJson(userQuery)
 
+        val jsonItem = gson.toJson(userQuery)
         val requestQueue: RequestQueue = Volley.newRequestQueue(context)
         val jsonObject = JSONObject(jsonItem)
         try {
@@ -81,7 +113,6 @@ class HomeFragment : Fragment() {
         val jsonArrayRequest = JsonArrayRequest(
             Request.Method.POST, url, jsonArray,
             { response ->
-                binding.textViewResponse.text = "Got response from POST."
                 Log.d("POST", "Response: $response")
 
                 // Parse the JSON array into a list of NewsItem objects
