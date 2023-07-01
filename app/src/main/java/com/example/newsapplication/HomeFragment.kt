@@ -1,13 +1,12 @@
 package com.example.newsapplication
 
-import android.R
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
 import android.widget.RadioButton
-import android.widget.RadioGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.android.volley.Request
@@ -22,6 +21,7 @@ import com.google.gson.reflect.TypeToken
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
+import java.time.LocalDate
 
 
 class HomeFragment : Fragment() {
@@ -39,6 +39,43 @@ class HomeFragment : Fragment() {
     ): View {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
         val root: View = binding.root
+
+        val yearSpinnerStart = binding.yearSpinnerStart
+        val monthSpinnerStart = binding.monthSpinnerStart
+        val daySpinnerStart = binding.daySpinnerStart
+        val yearSpinnerEnd = binding.yearSpinnerEnd
+        val monthSpinnerEnd = binding.monthSpinnerEnd
+        val daySpinnerEnd = binding.daySpinnerEnd
+
+        val currentDate = LocalDate.now()
+        val currentYear = currentDate.year
+        val currentMonth = currentDate.monthValue
+        val currentDay = currentDate.dayOfMonth
+
+        // Set data for the year Spinner
+        val years = (2000..currentYear).toList().toTypedArray()
+        val yearAdapter = ArrayAdapter<String>(requireContext(), R.layout.spinner_item, years.map { it.toString() })
+        yearAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        yearSpinnerStart!!.setAdapter(yearAdapter)
+        yearSpinnerStart!!.setSelection(currentYear - 2000)
+        yearSpinnerEnd!!.setAdapter(yearAdapter)
+        yearSpinnerEnd!!.setSelection(currentYear - 2000)
+
+        // Set data for the month Spinner
+        val months = (1..12).toList().toTypedArray()
+        val monthAdapter = ArrayAdapter<String>(requireContext(), R.layout.spinner_item, months.map { it.toString() })
+        monthAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        monthSpinnerStart!!.setAdapter(monthAdapter)
+        monthSpinnerEnd!!.setAdapter(monthAdapter)
+        monthSpinnerEnd!!.setSelection(currentMonth - 1)
+
+        // Set data for the day Spinner
+        val days = (1..31).toList().toTypedArray()
+        val dayAdapter = ArrayAdapter<String>(requireContext(), R.layout.spinner_item, days.map { it.toString() })
+        dayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        daySpinnerStart!!.setAdapter(dayAdapter)
+        daySpinnerEnd!!.setAdapter(dayAdapter)
+        daySpinnerEnd!!.setSelection(currentDay - 1)
 
         binding.buttonMakeQuery.setOnClickListener{
             if(binding.editTextQuery.text.toString().isBlank()) {
@@ -80,6 +117,24 @@ class HomeFragment : Fragment() {
             language = ""
         }
 
+        val yearSpinnerStart = binding.yearSpinnerStart
+        val monthSpinnerStart = binding.monthSpinnerStart
+        val daySpinnerStart = binding.daySpinnerStart
+        val yearSpinnerEnd = binding.yearSpinnerEnd
+        val monthSpinnerEnd = binding.monthSpinnerEnd
+        val daySpinnerEnd = binding.daySpinnerEnd
+
+        val selectedYearStart = yearSpinnerStart?.selectedItem.toString()
+        val selectedMonthStart = monthSpinnerStart?.selectedItem.toString()
+        val selectedDayStart = daySpinnerStart?.selectedItem.toString()
+        val selectedYearEnd = yearSpinnerEnd?.selectedItem.toString()
+        val selectedMonthEnd = monthSpinnerEnd?.selectedItem.toString()
+        val selectedDayEnd = daySpinnerEnd?.selectedItem.toString()
+
+        val startDate = selectedYearStart + "-" + selectedMonthStart + "-" + selectedDayStart
+        val endDate = selectedYearEnd + "-" + selectedMonthEnd + "-" + selectedDayEnd
+
+        Log.d("BETWEEN", startDate + " and " + endDate)
         // Make the query object
         val userQuery: UserQuery = UserQuery(
             query = queryWords,
@@ -88,8 +143,8 @@ class HomeFragment : Fragment() {
             language = language,
             pageSize = 10,
             page = 1,
-            start = "2023-06-10",
-            end = "2023-06-26")
+            start = startDate,
+            end = endDate)
 
         val jsonItem = gson.toJson(userQuery)
         val requestQueue: RequestQueue = Volley.newRequestQueue(context)
@@ -113,8 +168,6 @@ class HomeFragment : Fragment() {
         val jsonArrayRequest = JsonArrayRequest(
             Request.Method.POST, url, jsonArray,
             { response ->
-                Log.d("POST", "Response: $response")
-
                 // Parse the JSON array into a list of NewsItem objects
                 val newsItems: List<NewsItem> = gson.fromJson(
                     response.toString(),
