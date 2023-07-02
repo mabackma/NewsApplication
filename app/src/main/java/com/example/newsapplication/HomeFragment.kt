@@ -10,20 +10,9 @@ import android.widget.RadioButton
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import com.android.volley.Request
-import com.android.volley.RequestQueue
-import com.android.volley.toolbox.JsonArrayRequest
-import com.android.volley.toolbox.Volley
 import com.example.newsapplication.databinding.FragmentHomeBinding
-import com.example.newsapplication.datatypes.NewsItem
 import com.example.newsapplication.datatypes.UserQuery
-import com.google.gson.GsonBuilder
-import com.google.gson.reflect.TypeToken
-import org.json.JSONArray
-import org.json.JSONException
-import org.json.JSONObject
 import java.time.LocalDate
-
 
 class HomeFragment : Fragment() {
 
