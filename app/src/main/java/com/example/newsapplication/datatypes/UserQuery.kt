@@ -18,7 +18,7 @@ data class UserQuery (
 
 ) : Parcelable  {
 
-  // data class NewsItem implements Parcelable interface
+  // data class UserQuery implements Parcelable interface
   // Override the interface
   constructor(parcel: Parcel) : this(
     parcel.readString() ?: "",
@@ -37,15 +37,5 @@ data class UserQuery (
 
   override fun describeContents(): Int {
     return 0
-  }
-
-  companion object CREATOR : Parcelable.Creator<UserQuery> {
-    override fun createFromParcel(parcel: Parcel): UserQuery {
-      return UserQuery(parcel)
-    }
-
-    override fun newArray(size: Int): Array<UserQuery?> {
-      return arrayOfNulls(size)
-    }
   }
 }
