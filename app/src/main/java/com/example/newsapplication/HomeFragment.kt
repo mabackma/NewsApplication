@@ -9,6 +9,7 @@ import android.widget.ArrayAdapter
 import android.widget.RadioButton
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.android.volley.Request
 import com.android.volley.RequestQueue
 import com.android.volley.toolbox.JsonArrayRequest
@@ -28,9 +29,6 @@ class HomeFragment : Fragment() {
 
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
-
-    val url = "http://10.0.2.2:5000/search"
-    val gson = GsonBuilder().setPrettyPrinting().create()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -54,7 +52,10 @@ class HomeFragment : Fragment() {
 
         // Set data for the year Spinner
         val years = (2000..currentYear).toList().toTypedArray()
-        val yearAdapter = ArrayAdapter<String>(requireContext(), R.layout.spinner_item, years.map { it.toString() })
+        val yearAdapter = ArrayAdapter<String>(
+            requireContext(),
+            R.layout.spinner_item,
+            years.map { it.toString() })
         yearAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         yearSpinnerStart!!.setAdapter(yearAdapter)
         yearSpinnerStart!!.setSelection(currentYear - 2000)
@@ -63,7 +64,10 @@ class HomeFragment : Fragment() {
 
         // Set data for the month Spinner
         val months = (1..12).toList().toTypedArray()
-        val monthAdapter = ArrayAdapter<String>(requireContext(), R.layout.spinner_item, months.map { it.toString() })
+        val monthAdapter = ArrayAdapter<String>(
+            requireContext(),
+            R.layout.spinner_item,
+            months.map { it.toString() })
         monthAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         monthSpinnerStart!!.setAdapter(monthAdapter)
         monthSpinnerEnd!!.setAdapter(monthAdapter)
@@ -71,18 +75,25 @@ class HomeFragment : Fragment() {
 
         // Set data for the day Spinner
         val days = (1..31).toList().toTypedArray()
-        val dayAdapter = ArrayAdapter<String>(requireContext(), R.layout.spinner_item, days.map { it.toString() })
+        val dayAdapter = ArrayAdapter<String>(
+            requireContext(),
+            R.layout.spinner_item,
+            days.map { it.toString() })
         dayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         daySpinnerStart!!.setAdapter(dayAdapter)
         daySpinnerEnd!!.setAdapter(dayAdapter)
         daySpinnerEnd!!.setSelection(currentDay - 1)
 
-        binding.buttonMakeQuery.setOnClickListener{
-            if(binding.editTextQuery.text.toString().isBlank()) {
+        binding.buttonMakeQuery.setOnClickListener {
+            if (binding.editTextQuery.text.toString().isBlank()) {
                 Toast.makeText(context, "Please enter search keywords", Toast.LENGTH_SHORT).show()
+            } else {
+                val userQuery = makeQuery()
+
+                // Move to results fragment
+                val action = HomeFragmentDirections.actionHomeFragmentToResultsFragment(userQuery)
+                this.findNavController().navigate(action)
             }
-            else
-                makeQueryWithPost()
         }
 
         return root
@@ -93,19 +104,19 @@ class HomeFragment : Fragment() {
         _binding = null
     }
 
-    fun makeQueryWithPost() {
+    fun makeQuery(): UserQuery {
         val queryWords = binding.editTextQuery.text.toString()
         var searchIn = ""
-        if(binding.checkboxTitle.isChecked){
+        if (binding.checkboxTitle.isChecked) {
             searchIn += "title"
         }
-        if(binding.checkboxDescription.isChecked){
+        if (binding.checkboxDescription.isChecked) {
             searchIn += ",description"
         }
-        if(binding.checkboxContent.isChecked){
+        if (binding.checkboxContent.isChecked) {
             searchIn += ",content"
         }
-        if(searchIn.startsWith(",")) {
+        if (searchIn.startsWith(",")) {
             searchIn = searchIn.substring(1)
         }
 
@@ -113,7 +124,7 @@ class HomeFragment : Fragment() {
         val chosenLanguageRadioButton: RadioButton = view!!.findViewById(chosenLanguageId)
         var language = chosenLanguageRadioButton.text.toString()
 
-        if(language == "all") {
+        if (language == "all") {
             language = ""
         }
 
@@ -144,46 +155,8 @@ class HomeFragment : Fragment() {
             pageSize = 10,
             page = 1,
             start = startDate,
-            end = endDate)
-
-        val jsonItem = gson.toJson(userQuery)
-        val requestQueue: RequestQueue = Volley.newRequestQueue(context)
-        val jsonObject = JSONObject(jsonItem)
-        try {
-            jsonObject.put("query", userQuery.query)
-            jsonObject.put("search_in", userQuery.searchIn)
-            jsonObject.put("sort_items", userQuery.sortItems)
-            jsonObject.put("language", userQuery.language)
-            jsonObject.put("page_size", userQuery.pageSize)
-            jsonObject.put("page", userQuery.page)
-            jsonObject.put("start", userQuery.start)
-            jsonObject.put("end", userQuery.end)
-        } catch (e: JSONException) {
-            e.printStackTrace()
-        }
-
-        // Make a JSONArray for the request jsonObject
-        // This is necessary because the response will also be a JSONArray
-        val jsonArray = JSONArray().put(jsonObject)
-        val jsonArrayRequest = JsonArrayRequest(
-            Request.Method.POST, url, jsonArray,
-            { response ->
-                // Parse the JSON array into a list of NewsItem objects
-                val newsItems: List<NewsItem> = gson.fromJson(
-                    response.toString(),
-                    object : TypeToken<List<NewsItem>>() {}.type
-                )
-
-                // Access the properties of each NewsItem
-                for (newsItem in newsItems) {
-                    Log.d("POST", "News Item - Title: ${newsItem.title}, Publisher: ${newsItem.publisher}")
-                }
-            },
-            { error ->
-                Log.d("POST","Error getting POST response: ${error.message})")
-            }
+            end = endDate
         )
-
-        requestQueue.add(jsonArrayRequest)
+        return userQuery
     }
 }
