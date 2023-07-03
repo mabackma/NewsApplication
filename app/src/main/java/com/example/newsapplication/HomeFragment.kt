@@ -39,7 +39,7 @@ class HomeFragment : Fragment() {
         val currentMonth = currentDate.monthValue
         val currentDay = currentDate.dayOfMonth
 
-        // Set data for the year Spinner
+        // Set data for the year Spinner.
         val years = (currentYear - 5..currentYear).toList().toTypedArray()
         val yearAdapter = ArrayAdapter<String>(
             requireContext(),
