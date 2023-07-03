@@ -6,6 +6,8 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import androidx.navigation.fragment.navArgs
 import com.android.volley.Request
 import com.android.volley.RequestQueue
@@ -19,6 +21,7 @@ import com.google.gson.reflect.TypeToken
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
+import java.lang.Math.ceil
 
 class ResultsFragment : Fragment() {
 
@@ -29,6 +32,9 @@ class ResultsFragment : Fragment() {
     val gson = GsonBuilder().setPrettyPrinting().create()
 
     lateinit var userQuery: UserQuery
+    var pages: Array<Int> = emptyArray()
+    var selectedOption = ""
+    var selectedPage = 0
 
     // get fragment parameters from previous fragment
     val args: ResultsFragmentArgs by navArgs()
@@ -41,8 +47,54 @@ class ResultsFragment : Fragment() {
         _binding = FragmentResultsBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
+        val options = arrayOf("Relevancy", "Popularity", "Published at")
+        val sortByAdapter = ArrayAdapter<String>(requireContext(), R.layout.spinner_item, options)
+        binding.spinnerSortBy.adapter = sortByAdapter
+
+        // Call useQuery to fetch the data and update the UI after receiving the response
         userQuery = args.userQuery
-        useQuery(userQuery)
+        useQuery(userQuery) {pageCount ->
+            Log.d("PAGE COUNT", pageCount.toString())
+            // Update the UI with the received pageCount value
+            pages = (1..pageCount).toList().toTypedArray()
+            val pageAdapter = ArrayAdapter<String>(
+                requireContext(),
+                R.layout.spinner_item,
+                pages.map { it.toString() })
+            pageAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            binding.spinnerPage.adapter = pageAdapter
+        }
+
+        // Set the listener for the spinnerSortBy
+        binding.spinnerSortBy.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                selectedOption = options[position]
+                Log.d("SELECTED OPTION", selectedOption)
+            }
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+            }
+        }
+
+        // Set the listener for the spinnerPage
+        binding.spinnerPage.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                selectedPage = pages[position]
+                Log.d("SELECTED PAGE", selectedPage.toString())
+            }
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+            }
+        }
+
+        binding.buttonRefresh.setOnClickListener {
+            when (selectedOption) {
+                "Relevancy" -> userQuery.sortItems = "relevancy"
+                "Popularity" -> userQuery.sortItems = "popularity"
+                "Published at" -> userQuery.sortItems = "publishedAt"
+            }
+            userQuery.page = selectedPage
+
+            useQuery(userQuery) {pageCount ->}
+        }
 
         return root
     }
@@ -52,7 +104,7 @@ class ResultsFragment : Fragment() {
         _binding = null
     }
 
-    fun useQuery(userQuery: UserQuery) {
+    fun useQuery(userQuery: UserQuery, callback: (Int) -> Unit)  {
         val url = "http://10.0.2.2:5000/search"
         val gson = GsonBuilder().setPrettyPrinting().create()
 
@@ -78,11 +130,21 @@ class ResultsFragment : Fragment() {
         val jsonArrayRequest = JsonArrayRequest(
             Request.Method.POST, url, jsonArray,
             { response ->
+                // Response type is a tuple (news_count, all_news)
+                val newsCount = response.getInt(0)
+                val allNewsArray = response.getJSONArray(1)
                 // Parse the JSON array into a list of NewsItem objects
                 val newsItems: List<NewsItem> = gson.fromJson(
-                    response.toString(),
+                    allNewsArray.toString(),
                     object : TypeToken<List<NewsItem>>() {}.type
                 )
+                Log.d("NEWS COUNT", newsCount.toString())
+                Log.d("NEWS PER PAGE", newsItems.size.toString())
+                val pageCount = ceil(newsCount.toDouble() / newsItems.size.toDouble()).toInt()
+                // Invoke the callback with the size of newsItems
+                //callback(newsItems.howManyPages)
+                callback(pageCount)
+
                 // Access the properties of each NewsItem
                 for (newsItem in newsItems) {
                     Log.d("POST", "News Item - Title: ${newsItem.title}, Publisher: ${newsItem.publisher}")

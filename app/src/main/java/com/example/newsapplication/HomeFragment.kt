@@ -40,16 +40,16 @@ class HomeFragment : Fragment() {
         val currentDay = currentDate.dayOfMonth
 
         // Set data for the year Spinner
-        val years = (2000..currentYear).toList().toTypedArray()
+        val years = (currentYear - 5..currentYear).toList().toTypedArray()
         val yearAdapter = ArrayAdapter<String>(
             requireContext(),
             R.layout.spinner_item,
             years.map { it.toString() })
         yearAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         yearSpinnerStart!!.setAdapter(yearAdapter)
-        yearSpinnerStart!!.setSelection(currentYear - 2000)
+        yearSpinnerStart!!.setSelection(currentYear - (currentYear - 5))
         yearSpinnerEnd!!.setAdapter(yearAdapter)
-        yearSpinnerEnd!!.setSelection(currentYear - 2000)
+        yearSpinnerEnd!!.setSelection(currentYear - (currentYear - 5))
 
         // Set data for the month Spinner
         val months = (1..12).toList().toTypedArray()
@@ -141,7 +141,7 @@ class HomeFragment : Fragment() {
             searchIn = searchIn,
             sortItems = "publishedAt",
             language = language,
-            pageSize = 10,
+            pageSize = 20,
             page = 1,
             start = startDate,
             end = endDate
