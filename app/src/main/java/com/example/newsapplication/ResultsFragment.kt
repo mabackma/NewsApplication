@@ -131,15 +131,24 @@ class ResultsFragment : Fragment() {
         val jsonArrayRequest = JsonArrayRequest(
             Request.Method.POST, url, jsonArray,
             { response ->
+                // Response type is a tuple (news_count, all_news)
+                val newsCount = response.getInt(0)
+                val allNewsArray = response.getJSONArray(1)
                 val newsItems: List<NewsItem> = gson.fromJson(
-                    response.toString(),
+                    allNewsArray.toString(),
                     object : TypeToken<List<NewsItem>>() {}.type
                 )
                 Log.d("NEWS COUNT", "100")
                 Log.d("NEWS PER PAGE", newsItems.size.toString())
 
                 // Calculate how many pages of results there are
-                val pageCount = floor(100.0 / userQuery.pageSize!!.toDouble()).toInt()
+                var pageCount = 0
+                if(newsCount >= 100) {
+                    pageCount = floor(100.0 / userQuery.pageSize!!.toDouble()).toInt()
+                }
+                else {
+                    pageCount = ceil(newsCount.toDouble() / userQuery.pageSize!!.toDouble()).toInt()
+                }
                 callback(pageCount)
 
                 // Access the properties of each NewsItem
