@@ -7,8 +7,8 @@
     <fragment
         android:id="@+id/homeFragment"
         android:name="com.example.newsapplication.HomeFragment"
-        android:label="fragment_home"
-        tools:layout="@layout/fragment_home" >
+        android:label="Search"
+        tools:layout="@layout/fragment_home">
         <action
             android:id="@+id/action_homeFragment_to_resultsFragment"
             app:destination="@id/resultsFragment" />
@@ -16,8 +16,8 @@
     <fragment
         android:id="@+id/resultsFragment"
         android:name="com.example.newsapplication.ResultsFragment"
-        android:label="fragment_results"
-        tools:layout="@layout/fragment_results" >
+        android:label="Results"
+        tools:layout="@layout/fragment_results">
         <argument
             android:name="userQuery"
             app:argType="com.example.newsapplication.datatypes.UserQuery" />

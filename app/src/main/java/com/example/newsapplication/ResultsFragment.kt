@@ -22,6 +22,7 @@ import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
 import java.lang.Math.ceil
+import java.lang.Math.floor
 
 class ResultsFragment : Fragment() {
 
@@ -130,19 +131,15 @@ class ResultsFragment : Fragment() {
         val jsonArrayRequest = JsonArrayRequest(
             Request.Method.POST, url, jsonArray,
             { response ->
-                // Response type is a tuple (news_count, all_news)
-                val newsCount = response.getInt(0)
-                val allNewsArray = response.getJSONArray(1)
-                // Parse the JSON array into a list of NewsItem objects
                 val newsItems: List<NewsItem> = gson.fromJson(
-                    allNewsArray.toString(),
+                    response.toString(),
                     object : TypeToken<List<NewsItem>>() {}.type
                 )
-                Log.d("NEWS COUNT", newsCount.toString())
+                Log.d("NEWS COUNT", "100")
                 Log.d("NEWS PER PAGE", newsItems.size.toString())
-                val pageCount = ceil(newsCount.toDouble() / newsItems.size.toDouble()).toInt()
-                // Invoke the callback with the size of newsItems
-                //callback(newsItems.howManyPages)
+
+                // Calculate how many pages of results there are
+                val pageCount = floor(100.0 / userQuery.pageSize!!.toDouble()).toInt()
                 callback(pageCount)
 
                 // Access the properties of each NewsItem

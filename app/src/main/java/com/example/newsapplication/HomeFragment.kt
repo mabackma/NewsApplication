@@ -39,38 +39,55 @@ class HomeFragment : Fragment() {
         val currentMonth = currentDate.monthValue
         val currentDay = currentDate.dayOfMonth
 
+        var yearDifference = 0
+        if(currentMonth == 1) {
+            yearDifference = 1
+        }
+
         // Set data for the year Spinner.
-        val years = (currentYear - 5..currentYear).toList().toTypedArray()
+        val years = (currentYear - yearDifference..currentYear).toList().toTypedArray()
         val yearAdapter = ArrayAdapter<String>(
             requireContext(),
             R.layout.spinner_item,
             years.map { it.toString() })
         yearAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         yearSpinnerStart!!.setAdapter(yearAdapter)
-        yearSpinnerStart!!.setSelection(currentYear - (currentYear - 5))
+        yearSpinnerStart!!.setSelection(0)
         yearSpinnerEnd!!.setAdapter(yearAdapter)
-        yearSpinnerEnd!!.setSelection(currentYear - (currentYear - 5))
+        yearSpinnerEnd!!.setSelection(currentYear - (currentYear - yearDifference))
 
         // Set data for the month Spinner
-        val months = (1..12).toList().toTypedArray()
+        var months = arrayOf(currentMonth - 1, currentMonth)
+        if(yearDifference == 1) {
+            months = arrayOf(12, 1)
+        }
         val monthAdapter = ArrayAdapter<String>(
             requireContext(),
             R.layout.spinner_item,
             months.map { it.toString() })
         monthAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         monthSpinnerStart!!.setAdapter(monthAdapter)
+        monthSpinnerStart!!.setSelection(0)
         monthSpinnerEnd!!.setAdapter(monthAdapter)
-        monthSpinnerEnd!!.setSelection(currentMonth - 1)
+        monthSpinnerEnd!!.setSelection(1)
 
         // Set data for the day Spinner
-        val days = (1..31).toList().toTypedArray()
-        val dayAdapter = ArrayAdapter<String>(
+        val daysStart = (currentDay + 1 ..31).toList().toTypedArray()
+        val dayAdapterStart = ArrayAdapter<String>(
             requireContext(),
             R.layout.spinner_item,
-            days.map { it.toString() })
-        dayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        daySpinnerStart!!.setAdapter(dayAdapter)
-        daySpinnerEnd!!.setAdapter(dayAdapter)
+            daysStart.map { it.toString() })
+        dayAdapterStart.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        daySpinnerStart!!.setAdapter(dayAdapterStart)
+        daySpinnerStart!!.setSelection(0)
+
+        val daysEnd = (1..currentDay).toList().toTypedArray()
+        val dayAdapterEnd = ArrayAdapter<String>(
+            requireContext(),
+            R.layout.spinner_item,
+            daysEnd.map { it.toString() })
+        dayAdapterEnd.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        daySpinnerEnd!!.setAdapter(dayAdapterEnd)
         daySpinnerEnd!!.setSelection(currentDay - 1)
 
         binding.buttonMakeQuery.setOnClickListener {
@@ -135,13 +152,18 @@ class HomeFragment : Fragment() {
         val endDate = selectedYearEnd + "-" + selectedMonthEnd + "-" + selectedDayEnd
 
         Log.d("BETWEEN", startDate + " and " + endDate)
+
+        val chosenResultsPpId = binding.radioGroupResultsPerPage.checkedRadioButtonId
+        val chosenResultsPpRadioButton: RadioButton = view!!.findViewById(chosenResultsPpId)
+        var resultsPp = chosenResultsPpRadioButton.text.toString()
+
         // Make the query object
         val userQuery: UserQuery = UserQuery(
             query = queryWords,
             searchIn = searchIn,
             sortItems = "publishedAt",
             language = language,
-            pageSize = 20,
+            pageSize = resultsPp.toInt(),
             page = 1,
             start = startDate,
             end = endDate
