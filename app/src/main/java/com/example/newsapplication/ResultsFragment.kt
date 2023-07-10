@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.navigation.fragment.navArgs
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.android.volley.Request
 import com.android.volley.RequestQueue
 import com.android.volley.toolbox.JsonArrayRequest
@@ -40,6 +41,9 @@ class ResultsFragment : Fragment() {
     // get fragment parameters from previous fragment
     val args: ResultsFragmentArgs by navArgs()
 
+    private lateinit var newsAdapter: NewsAdapter
+    private lateinit var linearLayoutManager: LinearLayoutManager
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -48,10 +52,13 @@ class ResultsFragment : Fragment() {
         _binding = FragmentResultsBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
+        // Sort by selections in spinner
         val options = arrayOf("Relevancy", "Popularity", "Published at")
         val sortByAdapter = ArrayAdapter<String>(requireContext(), R.layout.spinner_item, options)
         binding.spinnerSortBy.adapter = sortByAdapter
+        binding.spinnerSortBy.setSelection(2);
 
+        // Page selections in spinner
         // Call useQuery to fetch the data and update the UI after receiving the response
         userQuery = args.userQuery
         useQuery(userQuery) {pageCount ->
@@ -96,6 +103,15 @@ class ResultsFragment : Fragment() {
 
             useQuery(userQuery) {pageCount ->}
         }
+
+        // Setting up the recycler view layout
+        linearLayoutManager = LinearLayoutManager(context)
+        linearLayoutManager.scrollToPosition(0)
+        binding.recyclerView.layoutManager = linearLayoutManager
+
+        // Set empty adapter to recycler view
+        newsAdapter = NewsAdapter(emptyList())
+        binding.recyclerView.adapter = newsAdapter
 
         return root
     }
@@ -151,9 +167,14 @@ class ResultsFragment : Fragment() {
                 }
                 callback(pageCount)
 
+                // Fill adapter with rows of news and set to recycler view
+                val rows : List<NewsItem> = gson.fromJson(allNewsArray.toString(), Array<NewsItem>::class.java).toList()
+                newsAdapter = NewsAdapter(rows)
+                binding.recyclerView.adapter = newsAdapter
+
                 // Access the properties of each NewsItem
                 for (newsItem in newsItems) {
-                    Log.d("POST", "News Item - Title: ${newsItem.title}, Publisher: ${newsItem.publisher}")
+                    Log.d("POST", "News Item - Title: ${newsItem.title}, Publisher: ${newsItem.publisher} ${newsItem.publishedAt}")
                 }
             },
             { error ->
