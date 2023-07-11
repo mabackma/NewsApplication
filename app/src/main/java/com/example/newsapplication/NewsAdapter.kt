@@ -1,5 +1,8 @@
 package com.example.newsapplication
 
+import android.content.Intent
+import android.net.Uri
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,49 +16,49 @@ import java.util.*
 
 class NewsAdapter(private val newsItems: List<NewsItem>) : RecyclerView.Adapter<NewsAdapter.NewsItemHolder>() {
 
-    // binding layerin muututjien alustaminen
+    // binding layer variable
     private var _binding: RecyclerviewItemRowBinding? = null
     private val binding get() = _binding!!
 
-    // ViewHolderin onCreate-metodi. käytännössä tässä kytketään binding layer
-    // osaksi CommentHolder-luokkaan (adapterin sisäinen luokka)
-    // koska CommentAdapter pohjautuu RecyclerViewin perusadapteriin, täytyy tästä
-    // luokasta löytyä metodi nimeltä onCreateViewHolder
+    // ViewHolderin onCreate-method. Attaching binding layer
+    // to NewsItemHolder-class (adapter inner class)
+    // because NewsAdapter is based on RecyclerView's standard adapter,
+    // we need a method called onCreateViewHolder
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NewsItemHolder {
-        // binding layerina toimii yksitätinen recyclerview_item_row.xml -instanssi
+        // binding layer is one recyclerview_item_row.xml -instance
         _binding = RecyclerviewItemRowBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return NewsItemHolder(binding)
     }
 
-    // tämä metodi kytkee yksittäisen Comment-objektin yksittäisen CommentHolder-instanssiin
-    // koska CommentAdapter pohjautuu RecyclerViewin perusadapteriin, täytyy tästä
-    // luokasta löytyä metodi nimeltä onBindViewHolder
+    // Attaches one NewsItem-object to one NewsItemHolder-instance
+    // because NewsAdapter is based on RecyclerView's standard adapter,
+    // we need a method called onBindViewHolder
     override fun onBindViewHolder(holder: NewsItemHolder, position: Int) {
         val itemNews = newsItems[position]
         holder.bindNewsItem(itemNews)
     }
 
-    // Adapterin täytyy pysty tietämään sisältämänsä datan koko tämän metodin avulla
-    // koska CommentAdapter pohjautuu RecyclerViewin perusadapteriin, täytyy tästä
-    // luokasta löytyä metodi nimeltä getItemCount
+    // The adapter has to know the size fo the data with this method
+    // because NewsItemAdapter is based on RecyclerView's standard adapter,
+    // we need a method called getItemCount
     override fun getItemCount(): Int {
         return newsItems.size
     }
 
-    // CommentHolder, joka määritettiin oman CommentAdapterin perusmäärityksessä (ks. luokan yläosa)
-    // Holder-luokka sisältää logiikan, jolla data ja ulkoasu kytketään toisiinsa
+    // NewsItemHolder is defined in NewsAdapter's basic definition
+    // Holder-class contains the logic for attaching it to the layout
     class NewsItemHolder(v: RecyclerviewItemRowBinding) : RecyclerView.ViewHolder(v.root), View.OnClickListener {
 
-        // tämän kommentin ulkoasu ja varsinainen data
+        // Binding for one newsItem
         private var view: RecyclerviewItemRowBinding = v
         private var newsItem: NewsItem? = null
 
-        // mahdollistetaan yksittäisen itemin klikkaaminen tässä luokassa
+        // Set image to be clickable
         init {
-            v.root.setOnClickListener(this)
+            v.imageViewNews.setOnClickListener(this)
         }
 
-        // bind the details of the news item tot he recyclerview item
+        // bind the details of the news item to the recyclerview item
         fun bindNewsItem(newsItem: NewsItem)
         {
             // Display title
@@ -77,24 +80,17 @@ class NewsAdapter(private val newsItems: List<NewsItem>) : RecyclerView.Adapter<
                 .into(view.imageViewNews)
         }
 
-        // jos itemiä klikataan käyttöliittymässä, ajetaan tämä koodio
+        // If image is clicked, run this
         override fun onClick(v: View) {
-            // tässä esimerkiksi actionilla ja navControllerin avulla
-            // navigoidaan toiseen fragmentiin, jonka tarkoitus on näyttää
-            // yksityiskohdat tästä kommentista.
+            Log.d("CLICK", "news item clicked! " + newsItem!!.newsUrl.toString())
+            openNewsUrlInBrowser(newsItem!!.newsUrl.toString())
+        }
 
-            // klikatun kommentin id:n saat haettua näin:
-            // comment.id
-
-            // parametrina tulee lähettää joko:
-            // 1. pelkkä kommentin id argumenttina
-            // 2. kaikki kommentin datat omina argumentteina
-            // 3. kaikki data JSON-muodossa yhtenä argumenttina (GSON)
-
-            // TOISESSA FRAGMENTISSA, voit ottaa navArgs / args-muuttujan
-            // avulla lähetetyn id-parametrin, ja muodostaa sen avulla esim. uuden URLin:
-
-            // JSON_URL = "https://jsonplaceholder.typicode.com/comments/" + args.id.toString()
+        // Open link in browser
+        private fun openNewsUrlInBrowser(newsUrl: String) {
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(newsUrl))
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            itemView.context.startActivity(intent)
         }
     }
 }
