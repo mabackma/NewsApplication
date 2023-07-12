@@ -17,20 +17,21 @@
         android:id="@+id/editText_query"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
         android:hint="Enter your search keywords here" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Search in: "
+        android:textStyle="bold"/>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_margin="20dp"
+        android:layout_marginBottom="10dp"
         android:gravity="center_horizontal">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Search in: "
-            android:textStyle="bold"/>
 
         <CheckBox
             android:id="@+id/checkbox_title"
@@ -61,7 +62,7 @@
         android:id="@+id/radioGroup_languages"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp"
+        android:layout_marginBottom="10dp"
         android:orientation="horizontal">
         <RadioButton
             android:id="@+id/radioButton_all"
@@ -116,7 +117,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="20dp"
+        android:layout_marginBottom="10dp"
         android:orientation="horizontal">
 
         <TextView
@@ -127,8 +128,10 @@
 
         <Spinner
             android:id="@+id/year_spinner_start"
-            android:layout_width="0dp"
+            android:layout_width="50dp"
             android:layout_height="wrap_content"
+            android:dropDownWidth="100dp"
+            android:spinnerMode="dropdown"
             android:layout_weight="1"/>
 
         <TextView
@@ -139,8 +142,10 @@
 
         <Spinner
             android:id="@+id/month_spinner_start"
-            android:layout_width="0dp"
+            android:layout_width="30dp"
             android:layout_height="wrap_content"
+            android:dropDownWidth="50dp"
+            android:spinnerMode="dropdown"
             android:layout_weight="1"/>
 
         <TextView
@@ -151,8 +156,10 @@
 
         <Spinner
             android:id="@+id/day_spinner_start"
-            android:layout_width="0dp"
+            android:layout_width="30dp"
             android:layout_height="wrap_content"
+            android:dropDownWidth="50dp"
+            android:spinnerMode="dropdown"
             android:layout_weight="1"/>
 
     </LinearLayout>
@@ -166,7 +173,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="20dp"
+        android:layout_marginBottom="20dp"
         android:orientation="horizontal">
 
         <TextView
@@ -177,8 +184,10 @@
 
         <Spinner
             android:id="@+id/year_spinner_end"
-            android:layout_width="0dp"
+            android:layout_width="50dp"
             android:layout_height="wrap_content"
+            android:dropDownWidth="100dp"
+            android:spinnerMode="dropdown"
             android:layout_weight="1"/>
 
         <TextView
@@ -189,8 +198,10 @@
 
         <Spinner
             android:id="@+id/month_spinner_end"
-            android:layout_width="0dp"
+            android:layout_width="30dp"
             android:layout_height="wrap_content"
+            android:dropDownWidth="50dp"
+            android:spinnerMode="dropdown"
             android:layout_weight="1"/>
 
         <TextView
@@ -201,8 +212,10 @@
 
         <Spinner
             android:id="@+id/day_spinner_end"
-            android:layout_width="0dp"
+            android:layout_width="30dp"
             android:layout_height="wrap_content"
+            android:dropDownWidth="50dp"
+            android:spinnerMode="dropdown"
             android:layout_weight="1"/>
 
     </LinearLayout>
@@ -217,7 +230,7 @@
         android:id="@+id/radioGroup_results_per_page"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp"
+        android:layout_marginBottom="10dp"
         android:orientation="horizontal">
         <RadioButton
             android:id="@+id/radioButton_ten"
@@ -243,7 +256,7 @@
         android:id="@+id/button_make_query"
         android:layout_width="200dp"
         android:layout_height="wrap_content"
-        android:layout_margin="20dp"
+        android:layout_marginBottom="10dp"
         android:text="MAKE QUERY"
         android:textColor="@color/white"
         android:textColorHint="#FFFFFF" />

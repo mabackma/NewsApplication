@@ -22,4 +22,9 @@
             android:name="userQuery"
             app:argType="com.example.newsapplication.datatypes.UserQuery" />
     </fragment>
+    <fragment
+        android:id="@+id/topHeadlinesFragment"
+        android:name="com.example.newsapplication.TopHeadlinesFragment"
+        android:label="fragment_top_headlines"
+        tools:layout="@layout/fragment_top_headlines" />
 </navigation>
