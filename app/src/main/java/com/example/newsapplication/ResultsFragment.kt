@@ -62,7 +62,6 @@ class ResultsFragment : Fragment() {
         // Call useQuery to fetch the data and update the UI after receiving the response
         userQuery = args.userQuery
         useQuery(userQuery) {pageCount ->
-            Log.d("PAGE COUNT", pageCount.toString())
             // Update the UI with the received pageCount value
             pages = (1..pageCount).toList().toTypedArray()
             val pageAdapter = ArrayAdapter<String>(
@@ -71,13 +70,14 @@ class ResultsFragment : Fragment() {
                 pages.map { it.toString() })
             pageAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             binding.spinnerPage.adapter = pageAdapter
+            binding.spinnerPage.setSelection(0)
         }
 
         // Set the listener for the spinnerSortBy
         binding.spinnerSortBy.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 selectedOption = options[position]
-                Log.d("SELECTED OPTION", selectedOption)
+                binding.spinnerPage.setSelection(0)
             }
             override fun onNothingSelected(parent: AdapterView<*>?) {
             }
@@ -87,7 +87,6 @@ class ResultsFragment : Fragment() {
         binding.spinnerPage.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 selectedPage = pages[position]
-                Log.d("SELECTED PAGE", selectedPage.toString())
             }
             override fun onNothingSelected(parent: AdapterView<*>?) {
             }
@@ -154,8 +153,6 @@ class ResultsFragment : Fragment() {
                     allNewsArray.toString(),
                     object : TypeToken<List<NewsItem>>() {}.type
                 )
-                Log.d("NEWS COUNT", "100")
-                Log.d("NEWS PER PAGE", newsItems.size.toString())
 
                 // Calculate how many pages of results there are
                 var pageCount = 0
@@ -171,11 +168,6 @@ class ResultsFragment : Fragment() {
                 val rows : List<NewsItem> = gson.fromJson(allNewsArray.toString(), Array<NewsItem>::class.java).toList()
                 newsAdapter = NewsAdapter(rows)
                 binding.recyclerView.adapter = newsAdapter
-
-                // Access the properties of each NewsItem
-                for (newsItem in newsItems) {
-                    Log.d("POST", "News Item - Title: ${newsItem.title}, Publisher: ${newsItem.publisher} ${newsItem.publishedAt}")
-                }
             },
             { error ->
                 Log.d("POST","Error getting POST response: ${error.message})")

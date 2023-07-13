@@ -35,9 +35,9 @@
 
         <Spinner
             android:id="@+id/spinner_page"
-            android:layout_width="50dp"
+            android:layout_width="70dp"
             android:layout_height="wrap_content"
-            android:dropDownWidth="wrap_content"
+            android:dropDownWidth="50dp"
             android:spinnerMode="dropdown"
             android:layout_weight="1"/>
     </LinearLayout>

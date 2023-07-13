@@ -1,7 +1,6 @@
 package com.example.newsapplication
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -150,8 +149,6 @@ class HomeFragment : Fragment() {
 
         val startDate = selectedYearStart + "-" + selectedMonthStart + "-" + selectedDayStart
         val endDate = selectedYearEnd + "-" + selectedMonthEnd + "-" + selectedDayEnd
-
-        Log.d("BETWEEN", startDate + " and " + endDate)
 
         val chosenResultsPpId = binding.radioGroupResultsPerPage.checkedRadioButtonId
         val chosenResultsPpRadioButton: RadioButton = view!!.findViewById(chosenResultsPpId)
