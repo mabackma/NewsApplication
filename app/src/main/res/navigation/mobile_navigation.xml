@@ -25,6 +25,6 @@
     <fragment
         android:id="@+id/topHeadlinesFragment"
         android:name="com.example.newsapplication.TopHeadlinesFragment"
-        android:label="fragment_top_headlines"
+        android:label="Top Headlines"
         tools:layout="@layout/fragment_top_headlines" />
 </navigation>

@@ -95,7 +95,7 @@ class TopHeadlinesFragment : Fragment() {
     }
 
     fun headlinesSearch()  {
-        val url = "http://10.0.2.2:5000/headlines"
+        val url = "https://news-project-backend.onrender.com/headlines"
         val gson = GsonBuilder().setPrettyPrinting().create()
 
         val requestQueue: RequestQueue = Volley.newRequestQueue(context)

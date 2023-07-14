@@ -30,7 +30,7 @@ class ResultsFragment : Fragment() {
     private var _binding: FragmentResultsBinding? = null
     private val binding get() = _binding!!
 
-    val url = "http://10.0.2.2:5000/search"
+    val url = "https://news-project-backend.onrender.com/search"
     val gson = GsonBuilder().setPrettyPrinting().create()
 
     lateinit var userQuery: UserQuery
@@ -121,7 +121,7 @@ class ResultsFragment : Fragment() {
     }
 
     fun useQuery(userQuery: UserQuery, callback: (Int) -> Unit)  {
-        val url = "http://10.0.2.2:5000/search"
+        val url = "https://news-project-backend.onrender.com/search"
         val gson = GsonBuilder().setPrettyPrinting().create()
 
         val jsonItem = gson.toJson(userQuery)
