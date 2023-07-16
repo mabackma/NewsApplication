@@ -10,7 +10,8 @@ data class NewsItem (
   @SerializedName("news_url"     ) var newsUrl     : String? = null,
   @SerializedName("published_at" ) var publishedAt : String? = null,
   @SerializedName("publisher"    ) var publisher   : String? = null,
-  @SerializedName("title"        ) var title       : String? = null
+  @SerializedName("title"        ) var title       : String? = null,
+  @SerializedName("description"  ) var description : String? = null
 
 ) : Parcelable {
 

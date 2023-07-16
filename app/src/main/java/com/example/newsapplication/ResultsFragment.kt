@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.android.volley.Request
@@ -109,7 +110,7 @@ class ResultsFragment : Fragment() {
         binding.recyclerView.layoutManager = linearLayoutManager
 
         // Set empty adapter to recycler view
-        newsAdapter = NewsAdapter(emptyList())
+        newsAdapter = NewsAdapter(emptyList(), findNavController(), "results")
         binding.recyclerView.adapter = newsAdapter
 
         return root
@@ -166,7 +167,7 @@ class ResultsFragment : Fragment() {
 
                 // Fill adapter with rows of news and set to recycler view
                 val rows : List<NewsItem> = gson.fromJson(allNewsArray.toString(), Array<NewsItem>::class.java).toList()
-                newsAdapter = NewsAdapter(rows)
+                newsAdapter = NewsAdapter(rows, findNavController(), "results")
                 binding.recyclerView.adapter = newsAdapter
             },
             { error ->

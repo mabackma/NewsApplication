@@ -2,10 +2,11 @@ package com.example.newsapplication
 
 import android.content.Intent
 import android.net.Uri
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.navigation.NavController
+import androidx.navigation.NavDirections
 import androidx.recyclerview.widget.RecyclerView
 import com.example.newsapplication.databinding.RecyclerviewItemRowBinding
 import com.example.newsapplication.datatypes.NewsItem
@@ -14,7 +15,10 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import java.text.SimpleDateFormat
 import java.util.*
 
-class NewsAdapter(private val newsItems: List<NewsItem>) : RecyclerView.Adapter<NewsAdapter.NewsItemHolder>() {
+
+class NewsAdapter(private val newsItems: List<NewsItem>,
+                  private val navController: NavController,
+                  private val currentFragment: String) : RecyclerView.Adapter<NewsAdapter.NewsItemHolder>() {
 
     // binding layer variable
     private var _binding: RecyclerviewItemRowBinding? = null
@@ -27,7 +31,7 @@ class NewsAdapter(private val newsItems: List<NewsItem>) : RecyclerView.Adapter<
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NewsItemHolder {
         // binding layer is one recyclerview_item_row.xml -instance
         _binding = RecyclerviewItemRowBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return NewsItemHolder(binding)
+        return NewsItemHolder(binding, navController, currentFragment)
     }
 
     // Attaches one NewsItem-object to one NewsItemHolder-instance
@@ -47,11 +51,15 @@ class NewsAdapter(private val newsItems: List<NewsItem>) : RecyclerView.Adapter<
 
     // NewsItemHolder is defined in NewsAdapter's basic definition
     // Holder-class contains the logic for attaching it to the layout
-    class NewsItemHolder(v: RecyclerviewItemRowBinding) : RecyclerView.ViewHolder(v.root), View.OnClickListener {
+    class NewsItemHolder(v: RecyclerviewItemRowBinding,
+                         private val navController: NavController,
+                         currentFragment: String) :
+        RecyclerView.ViewHolder(v.root), View.OnClickListener {
 
         // Binding for one newsItem
         private var view: RecyclerviewItemRowBinding = v
         private var newsItem: NewsItem? = null
+        private val currentFragment = currentFragment
 
         // Set image to be clickable
         init {
@@ -82,15 +90,17 @@ class NewsAdapter(private val newsItems: List<NewsItem>) : RecyclerView.Adapter<
 
         // If image is clicked, run this
         override fun onClick(v: View) {
-            Log.d("CLICK", "news item clicked! " + newsItem!!.newsUrl.toString())
-            openNewsUrlInBrowser(newsItem!!.newsUrl.toString())
-        }
-
-        // Open link in browser
-        private fun openNewsUrlInBrowser(newsUrl: String) {
-            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(newsUrl))
-            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-            itemView.context.startActivity(intent)
+            // Move to details fragment
+            var action: NavDirections? = null
+            if (currentFragment == "results") {
+                action = ResultsFragmentDirections.actionResultsFragmentToDetailsFragment(newsItem!!)
+            }
+            if (currentFragment == "headlines") {
+                action = TopHeadlinesFragmentDirections.actionTopHeadlinesFragmentToDetailsFragment(newsItem!!)
+            }
+            action?.let {
+                navController.navigate(it)
+            }
         }
     }
 }
