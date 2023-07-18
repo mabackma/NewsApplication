@@ -134,10 +134,6 @@ class TopHeadlinesFragment : Fragment() {
             { response ->
                 // Response type is a tuple (news_count, all_news)
                 val allNewsArray = response.getJSONArray(1)
-                val newsItems: List<NewsItem> = gson.fromJson(
-                    allNewsArray.toString(),
-                    object : TypeToken<List<NewsItem>>() {}.type
-                )
 
                 // Headline results info
                 binding.textViewHeadlineResults.text = "Top ${selectedCategory} headlines in ${countryCodes[selectedCountry]}:"

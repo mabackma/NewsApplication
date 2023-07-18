@@ -150,10 +150,6 @@ class ResultsFragment : Fragment() {
                 // Response type is a tuple (news_count, all_news)
                 val newsCount = response.getInt(0)
                 val allNewsArray = response.getJSONArray(1)
-                val newsItems: List<NewsItem> = gson.fromJson(
-                    allNewsArray.toString(),
-                    object : TypeToken<List<NewsItem>>() {}.type
-                )
 
                 // Calculate how many pages of results there are
                 var pageCount = 0
