@@ -165,6 +165,9 @@ class ResultsFragment : Fragment() {
                 }
                 callback(pageCount)
 
+                // Results info
+                binding.textViewSearchResults.text = "Showing page ${userQuery.page}/${pageCount} in results for \"${userQuery.query}\":"
+
                 // Fill adapter with rows of news and set to recycler view
                 val rows : List<NewsItem> = gson.fromJson(allNewsArray.toString(), Array<NewsItem>::class.java).toList()
                 newsAdapter = NewsAdapter(rows, findNavController(), "results")

@@ -56,6 +56,16 @@
         android:textColor="@color/white"
         android:textColorHint="#FFFFFF" />
 
+    <TextView
+        android:id="@+id/textView_headline_results"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:layout_marginTop="5dp"
+        android:layout_marginHorizontal="5dp"
+        android:textColor="@color/purple_700"
+        android:textSize="20dp"/>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_view_headlines"
         android:layout_width="match_parent"
