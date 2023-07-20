@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.RadioButton
 import android.widget.Toast
@@ -88,6 +89,28 @@ class HomeFragment : Fragment() {
         dayAdapterEnd.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         daySpinnerEnd!!.setAdapter(dayAdapterEnd)
         daySpinnerEnd!!.setSelection(currentDay - 1)
+
+        // Set the listener for the start month
+        binding.monthSpinnerStart.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                if(position == 1) {
+                    binding.monthSpinnerEnd.setSelection(1)
+                }
+            }
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+            }
+        }
+
+        // Set the listener for the end month
+        binding.monthSpinnerEnd.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                if(position == 0) {
+                    binding.monthSpinnerStart.setSelection(0)
+                }
+            }
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+            }
+        }
 
         binding.buttonMakeQuery.setOnClickListener {
             if (binding.editTextQuery.text.toString().isBlank()) {

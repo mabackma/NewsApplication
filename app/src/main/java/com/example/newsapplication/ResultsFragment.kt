@@ -148,12 +148,13 @@ class ResultsFragment : Fragment() {
             Request.Method.POST, url, jsonArray,
             { response ->
                 // Response type is a tuple (news_count, all_news)
-                val newsCount = response.getInt(0)
+                var newsCount = response.getInt(0)
                 val allNewsArray = response.getJSONArray(1)
 
                 // Calculate how many pages of results there are
                 var pageCount = 0
                 if(newsCount >= 100) {
+                    newsCount = 100
                     pageCount = floor(100.0 / userQuery.pageSize!!.toDouble()).toInt()
                 }
                 else {
@@ -162,7 +163,7 @@ class ResultsFragment : Fragment() {
                 callback(pageCount)
 
                 // Results info
-                binding.textViewSearchResults.text = "Showing page ${userQuery.page}/${pageCount} in results for \"${userQuery.query}\":"
+                binding.textViewSearchResults.text = "Showing page ${userQuery.page}/${pageCount} in ${newsCount} results for \"${userQuery.query}\":"
 
                 // Fill adapter with rows of news and set to recycler view
                 val rows : List<NewsItem> = gson.fromJson(allNewsArray.toString(), Array<NewsItem>::class.java).toList()
