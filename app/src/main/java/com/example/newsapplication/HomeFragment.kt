@@ -101,7 +101,7 @@ class HomeFragment : Fragment() {
             }
         }
 
-        // Set the listener for the end month
+        // Set the listener for the end month.
         binding.monthSpinnerEnd.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 if(position == 0) {

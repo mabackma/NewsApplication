@@ -151,7 +151,7 @@ class ResultsFragment : Fragment() {
                 var newsCount = response.getInt(0)
                 val allNewsArray = response.getJSONArray(1)
 
-                // Calculate how many pages of results there are
+                // Calculate how many pages of results there are.
                 var pageCount = 0
                 if(newsCount >= 100) {
                     newsCount = 100
