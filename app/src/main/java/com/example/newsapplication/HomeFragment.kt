@@ -1,13 +1,11 @@
 package com.example.newsapplication
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
-import android.widget.RadioButton
-import android.widget.Toast
+import android.widget.*
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.newsapplication.databinding.FragmentHomeBinding
@@ -19,6 +17,31 @@ class HomeFragment : Fragment() {
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
 
+    var selectedYearStartStr: String = ""
+    var selectedYearStart: Int = 0
+    var selectedMonthStartStr: String = ""
+    var selectedMonthStart: Int = 0
+    var selectedDayStartStr: String = ""
+    var selectedDayStart: Int = 0
+    var selectedYearEndStr: String = ""
+    var selectedYearEnd: Int = 0
+    var selectedMonthEndStr: String = ""
+    var selectedMonthEnd: Int = 0
+    var selectedDayEndStr: String = ""
+    var selectedDayEnd: Int = 0
+
+    val currentDate = LocalDate.now()
+    val currentYear = currentDate.year
+    val currentMonth = currentDate.monthValue
+    val currentDay = currentDate.dayOfMonth
+
+    lateinit var yearSpinnerStart: Spinner
+    lateinit var monthSpinnerStart: Spinner
+    lateinit var daySpinnerStart: Spinner
+    lateinit var yearSpinnerEnd: Spinner
+    lateinit var monthSpinnerEnd: Spinner
+    lateinit var daySpinnerEnd: Spinner
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -27,17 +50,12 @@ class HomeFragment : Fragment() {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-        val yearSpinnerStart = binding.yearSpinnerStart
-        val monthSpinnerStart = binding.monthSpinnerStart
-        val daySpinnerStart = binding.daySpinnerStart
-        val yearSpinnerEnd = binding.yearSpinnerEnd
-        val monthSpinnerEnd = binding.monthSpinnerEnd
-        val daySpinnerEnd = binding.daySpinnerEnd
-
-        val currentDate = LocalDate.now()
-        val currentYear = currentDate.year
-        val currentMonth = currentDate.monthValue
-        val currentDay = currentDate.dayOfMonth
+        yearSpinnerStart = binding.yearSpinnerStart
+        monthSpinnerStart = binding.monthSpinnerStart
+        daySpinnerStart = binding.daySpinnerStart
+        yearSpinnerEnd = binding.yearSpinnerEnd
+        monthSpinnerEnd = binding.monthSpinnerEnd
+        daySpinnerEnd = binding.daySpinnerEnd
 
         var yearDifference = 0
         if(currentMonth == 1) {
@@ -72,16 +90,16 @@ class HomeFragment : Fragment() {
         monthSpinnerEnd!!.setSelection(1)
 
         // Set data for the day Spinner
-        val daysStart = (currentDay + 1 ..31).toList().toTypedArray()
+        val daysStart = (1 ..31).toList().toTypedArray()
         val dayAdapterStart = ArrayAdapter<String>(
             requireContext(),
             R.layout.spinner_item,
             daysStart.map { it.toString() })
         dayAdapterStart.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         daySpinnerStart!!.setAdapter(dayAdapterStart)
-        daySpinnerStart!!.setSelection(0)
+        daySpinnerStart!!.setSelection(currentDay - 1)
 
-        val daysEnd = (1..currentDay).toList().toTypedArray()
+        val daysEnd = (1..31).toList().toTypedArray()
         val dayAdapterEnd = ArrayAdapter<String>(
             requireContext(),
             R.layout.spinner_item,
@@ -90,12 +108,15 @@ class HomeFragment : Fragment() {
         daySpinnerEnd!!.setAdapter(dayAdapterEnd)
         daySpinnerEnd!!.setSelection(currentDay - 1)
 
+        getSpinnerValues()
+
         // Set the listener for the start month
         binding.monthSpinnerStart.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 if(position == 1) {
                     binding.monthSpinnerEnd.setSelection(1)
                 }
+                checkStartDate(selectedDayStart-1)
             }
             override fun onNothingSelected(parent: AdapterView<*>?) {
             }
@@ -107,6 +128,25 @@ class HomeFragment : Fragment() {
                 if(position == 0) {
                     binding.monthSpinnerStart.setSelection(0)
                 }
+                checkEndDate(selectedDayEnd-1)
+            }
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+            }
+        }
+
+        // Set the listener for the start day
+        binding.daySpinnerStart.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                checkStartDate(position)
+            }
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+            }
+        }
+
+        // Set the listener for the end day
+        binding.daySpinnerEnd.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                checkEndDate(position)
             }
             override fun onNothingSelected(parent: AdapterView<*>?) {
             }
@@ -130,6 +170,50 @@ class HomeFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    // Corrects the start day if it's out of bounds
+    fun checkStartDate(position: Int) {
+        getSpinnerValues()
+        if((selectedMonthStart == currentMonth-1 || selectedMonthStart == 12) && position < currentDay-1) {
+            binding.daySpinnerStart.setSelection(currentDay-1)
+        }
+        if(selectedMonthStart == currentMonth && position >= currentDay) {
+            binding.daySpinnerStart.setSelection(currentDay-1)
+        }
+        if(selectedMonthStart == selectedMonthEnd && position >= selectedDayEnd) {
+            binding.daySpinnerStart.setSelection(selectedDayEnd-1)
+        }
+    }
+
+    // Corrects the end day if it's out of bounds
+    fun checkEndDate(position: Int) {
+        getSpinnerValues()
+        if((selectedMonthEnd == currentMonth-1 || selectedMonthEnd == 12) && position < currentDay-1) {
+            binding.daySpinnerEnd.setSelection(currentDay-1)
+        }
+        if(selectedMonthEnd == currentMonth && position >= currentDay) {
+            binding.daySpinnerEnd.setSelection(currentDay-1)
+        }
+        if(selectedMonthEnd == selectedMonthStart && position < selectedDayStart-1) {
+            binding.daySpinnerEnd.setSelection(selectedDayStart-1)
+        }
+    }
+
+    // Gets all the values from the spinners
+    fun getSpinnerValues() {
+        selectedYearStartStr = binding.yearSpinnerStart.selectedItem as String
+        selectedYearStart = selectedYearStartStr.toInt()
+        selectedMonthStartStr = binding.monthSpinnerStart.selectedItem as String
+        selectedMonthStart = selectedMonthStartStr.toInt()
+        selectedDayStartStr = binding.daySpinnerStart.selectedItem as String
+        selectedDayStart = selectedDayStartStr.toInt()
+        selectedYearEndStr = binding.yearSpinnerStart.selectedItem as String
+        selectedYearEnd = selectedYearEndStr.toInt()
+        selectedMonthEndStr = binding.monthSpinnerEnd.selectedItem as String
+        selectedMonthEnd = selectedMonthEndStr.toInt()
+        selectedDayEndStr = binding.daySpinnerEnd.selectedItem as String
+        selectedDayEnd = selectedDayEndStr.toInt()
     }
 
     fun makeQuery(): UserQuery {
@@ -156,22 +240,10 @@ class HomeFragment : Fragment() {
             language = ""
         }
 
-        val yearSpinnerStart = binding.yearSpinnerStart
-        val monthSpinnerStart = binding.monthSpinnerStart
-        val daySpinnerStart = binding.daySpinnerStart
-        val yearSpinnerEnd = binding.yearSpinnerEnd
-        val monthSpinnerEnd = binding.monthSpinnerEnd
-        val daySpinnerEnd = binding.daySpinnerEnd
+        getSpinnerValues()
 
-        val selectedYearStart = yearSpinnerStart?.selectedItem.toString()
-        val selectedMonthStart = monthSpinnerStart?.selectedItem.toString()
-        val selectedDayStart = daySpinnerStart?.selectedItem.toString()
-        val selectedYearEnd = yearSpinnerEnd?.selectedItem.toString()
-        val selectedMonthEnd = monthSpinnerEnd?.selectedItem.toString()
-        val selectedDayEnd = daySpinnerEnd?.selectedItem.toString()
-
-        val startDate = selectedYearStart + "-" + selectedMonthStart + "-" + selectedDayStart
-        val endDate = selectedYearEnd + "-" + selectedMonthEnd + "-" + selectedDayEnd
+        val startDate = selectedYearStart.toString() + "-" + selectedMonthStart.toString() + "-" + selectedDayStart.toString()
+        val endDate = selectedYearEnd.toString() + "-" + selectedMonthEnd.toString() + "-" + selectedDayEnd.toString()
 
         val chosenResultsPpId = binding.radioGroupResultsPerPage.checkedRadioButtonId
         val chosenResultsPpRadioButton: RadioButton = view!!.findViewById(chosenResultsPpId)
